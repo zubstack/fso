@@ -1,17 +1,20 @@
+import personService from '../services/persons.jsx'
 
 const AddPersonForm = ({persons, setPersons, newName, setNewName, newNumber, setNewNumber}) => {
   const addPerson = (event) => {
     event.preventDefault()
-    const currID = persons.at(-1).id
-    const newPerson = { name : newName, number: newNumber, id: currID +1}
-    console.log(newPerson) 
+    const newPerson = { name : newName, number: newNumber}
+
     if (!newName || !newNumber) return 
     if (!persons.some(item => item.name == newName)){
-      const newList = persons.concat(newPerson)
-      setPersons(newList)
+      personService
+        .create(newPerson)
+        .then(data => setPersons(persons.concat(data)))
+        .catch(error => console.log(error))
     }else{
       alert(`${newName} was already included.`)
     }
+
     setNewName("")
     setNewNumber("")
   }

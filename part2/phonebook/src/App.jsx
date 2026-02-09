@@ -1,5 +1,5 @@
-import axios from "axios"
 import { useState, useEffect } from 'react'
+import personService from "./services/persons.jsx";
 import Filter from "./components/Filter.jsx";
 import AddPersonForm from "./components/AddPersonForm.jsx";
 import Persons from "./components/Persons.jsx";
@@ -12,17 +12,13 @@ const App = () => {
   const [searchingString, setSearchingString] = useState('')
 
   useEffect(() => {
-    axios
-      .get('http://localhost:3002/persons') 
-      .then((result) => {
-        setPersons(result.data)
+    personService
+      .getAll()
+      .then((data) => {
+        setPersons(data)
       })
+      .catch(error => alert(`Error while trying to retrive data: ${error.message}`))
   }, [])
-  
-
-  const peopleToShow = searchingString == ''
-    ? persons
-    : persons.filter((person) =>  person.name.toLowerCase().startsWith(searchingString.toLowerCase()))
 
   return (
     <div>
@@ -32,7 +28,7 @@ const App = () => {
       <hr/>
       <Filter setSearchingString={setSearchingString} searchingString={searchingString}/>
       <hr/>
-      <Persons peopleToShow={peopleToShow}/>
+      <Persons persons={persons} setPersons={setPersons} searchingString={searchingString}/>
     </div>
   )
 }

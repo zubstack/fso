@@ -17,8 +17,7 @@ const AddPersonForm = ({persons, setPersons, newName, setNewName, newNumber, set
         personService
           .update(existingPerson.id, newPerson)
           .then(result => {
-            const filtered = persons.filter(item => item.name != newName)
-            setPersons([...filtered, result])
+            setPersons(persons.map(item => item.id != existingPerson.id ? item : result)) // this works better than the filter approach
           })
           .catch(error => console.log(error))
       }

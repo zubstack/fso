@@ -4,15 +4,24 @@ const AddPersonForm = ({persons, setPersons, newName, setNewName, newNumber, set
   const addPerson = (event) => {
     event.preventDefault()
     const newPerson = { name : newName, number: newNumber}
+    const existingPerson = persons.find(item => item.name == newName)
 
     if (!newName || !newNumber) return 
-    if (!persons.some(item => item.name == newName)){
+    if (!existingPerson){
       personService
         .create(newPerson)
         .then(data => setPersons(persons.concat(data)))
         .catch(error => console.log(error))
     }else{
-      alert(`${newName} was already included.`)
+      if(window.confirm('This person already exists. Do you want to update its number?')){
+        personService
+          .update(existingPerson.id, newPerson)
+          .then(result => {
+            const filtered = persons.filter(item => item.name != newName)
+            setPersons([...filtered, result])
+          })
+          .catch(error => console.log(error))
+      }
     }
 
     setNewName("")

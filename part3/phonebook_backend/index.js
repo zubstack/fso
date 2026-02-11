@@ -5,15 +5,6 @@ const app = express()
 
 app.use(express.json())
 
-const requestLogger = (request, response, next) => {
-  console.log('Method:', request.method)
-  console.log('Path:  ', request.path)
-  console.log('Body:  ', request.body)
-  console.log('---')
-  next()
-}
-
-// app.use(requestLogger)
 morgan.token('body', function (req, res) { return JSON.stringify(req.body) })
 app.use(morgan(':method :url :status - :response-time ms :body'))
 

@@ -1,9 +1,11 @@
 const express = require('express')
 const morgan = require('morgan')
+const cors = require('cors')
 let persons = require('./db.json')
 const app = express()
 
 app.use(express.json())
+app.use(cors())
 
 morgan.token('body', function (req, res) { return JSON.stringify(req.body) })
 app.use(morgan(':method :url :status - :response-time ms :body'))
@@ -13,7 +15,7 @@ app.get('/', (request, response) => {
 })
 
 app.get('/api/persons', (request, response) => {
-  response.send(persons)
+  response.status(200).send(persons)
 })
 
 app.get('/api/info', (request, response) => {

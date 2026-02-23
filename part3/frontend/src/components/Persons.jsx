@@ -12,10 +12,6 @@ const PersonItem = ({person, onRemovePerson}) => {
 
 const Persons = ({peopleToShow, onRemovePerson}) => {
 
-  if (!peopleToShow || !Array.isArray(peopleToShow)) return (
-    <p>Nothing to show here.</p>
-  )
-
   return (
     <>
       {peopleToShow.map((person) => {

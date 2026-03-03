@@ -11,13 +11,15 @@ const app = express()
 
 logger.info('connecting to ', MONGODB_URI)
 
-mongoose.connect(MONGODB_URI, { family: 4 })
-  .then(() => {
-    logger.info('connected to database')
-  })
-  .catch((error) => {
-    logger.error('error connection to database', error.message)
-  })
+  ; (async () => {
+    try {
+      await mongoose.connect(MONGODB_URI);
+      logger.info('Successfully connected to database');
+    } catch (error) {
+      logger.error('Initial connection failed:', error.message);
+      process.exit(1);
+    }
+  })()
 
 app.use(express.static('dist'))
 app.use(express.json())

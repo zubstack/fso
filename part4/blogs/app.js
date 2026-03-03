@@ -1,7 +1,7 @@
 
 const express = require('express')
 const mongoose = require('mongoose')
-const { DATABASE_URL } = require('./utils/config.js')
+const { MONGODB_URI } = require('./utils/config.js')
 const logger = require('./utils/logger.js')
 const { errorHandler, requestLogger, unknownEndpoint } = require('./utils/middleware.js')
 
@@ -9,9 +9,9 @@ const blogsRouter = require('./controllers/blogs.js')
 
 const app = express()
 
-logger.info('connecting to ', DATABASE_URL)
+logger.info('connecting to ', MONGODB_URI)
 
-mongoose.connect(DATABASE_URL, { family: 4 })
+mongoose.connect(MONGODB_URI, { family: 4 })
   .then(() => {
     logger.info('connected to database')
   })

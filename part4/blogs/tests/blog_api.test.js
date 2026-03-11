@@ -5,7 +5,7 @@ const supertest = require('supertest')
 
 const app = require('../app')
 const Blog = require('../models/blog.js')
-const blogs_data = require('../utils/blogs_data.js')
+const blogs_data = require('./blogs_data.js')
 const helper = require('./helper_test.js')
 
 const api = supertest(app)

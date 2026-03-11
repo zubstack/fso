@@ -3,9 +3,9 @@ const { test, after, beforeEach, describe } = require('node:test')
 const mongoose = require('mongoose')
 const supertest = require('supertest')
 
-const app = require('../app')
+const app = require('../app.js')
 const Blog = require('../models/blog.js')
-const blogs_data = require('./blogs_data.js')
+const blogs_data = require('./blogs.data.js')
 const helper = require('./helper_test.js')
 
 const api = supertest(app)
@@ -17,22 +17,33 @@ beforeEach(async () => {
   await Promise.all(promiseArray)
 })
 
-test('blogs are returned as json', async () => {
-  await api
-    .get('/api/blogs')
-    .expect(200)
-    .expect('Content-Type', /application\/json/)
-})
+describe('description', () => {
+  test('blogs are returned as json', async () => {
+    await api
+      .get('/api/blogs')
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+  })
 
-test('all blogs are returned', async () => {
-  const response = await api.get('/api/blogs')
-  assert.strictEqual(response.body.length, blogs_data.length)
-})
+  test('all blogs are returned', async () => {
+    const response = await api.get('/api/blogs')
+    assert.strictEqual(response.body.length, blogs_data.length)
+  })
 
-test('blogs contain \'id\' field as identifier', async () => {
-  const response = await api.get('/api/blogs')
-  assert.equal(Object.keys(response.body[0]).includes('id'), true)
-  assert.equal(Object.keys(response.body[0]).includes('_id'), false)
+  test('blogs contain \'id\' field as identifier', async () => {
+    const response = await api.get('/api/blogs')
+    assert.equal(Object.keys(response.body[0]).includes('id'), true)
+    assert.equal(Object.keys(response.body[0]).includes('_id'), false)
+  })
+
+  test('the creator\'s user information is displayed with the blog', async () => {
+    const response = await api.get('/api/users')
+    const responseKeys = Object.keys(response.body[0])
+    const userKeys = Object.keys(responseKeys)
+    assert.equal(responseKeys.includes('user'), true)
+    assert.equal(userKeys.includes('username'), true)
+  })
+
 })
 
 describe('creating a new blog', () => {
@@ -80,6 +91,7 @@ describe('creating a new blog', () => {
     const response = await helper.blogsInDb()
     assert.strictEqual(response.length, blogs_data.length)
   })
+
 })
 
 describe('deleting blogs', () => {
@@ -98,6 +110,7 @@ describe('deleting blogs', () => {
       .delete(`/api/blogs/${idDeleted}`)
       .expect(404)
   })
+
 })
 
 describe('updating blogs', () => {
@@ -113,6 +126,7 @@ describe('updating blogs', () => {
       .expect(200)
     assert.strictEqual(updatedBlog.body.likes, updatePayload.likes)
   })
+
 })
 
 after(async () => {

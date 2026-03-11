@@ -4,9 +4,9 @@ const { test, after, beforeEach, describe } = require('node:test')
 const mongoose = require('mongoose')
 const supertest = require('supertest')
 
-const app = require('../app')
+const app = require('../app.js')
 const User = require('../models/user.js')
-const users_data = require('./users_data.js')
+const users_data = require('./users.data.js')
 const helper = require('./helper_test.js')
 
 const api = supertest(app)
@@ -18,23 +18,20 @@ beforeEach(async () => {
   await Promise.all(promiseArray)
 })
 
-test('users are returned as json', async () => {
-  await api
-    .get('/api/users')
-    .expect(200)
-    .expect('Content-Type', /application\/json/)
-})
+describe('query users information', () => {
+  test('users are returned as json', async () => {
+    await api
+      .get('/api/users')
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+  })
 
-test('all users are returned', async () => {
-  const response = await api.get('/api/users')
-  assert.strictEqual(response.body.length, users_data.length)
-})
+  test('all users are returned', async () => {
+    const response = await api.get('/api/users')
+    assert.strictEqual(response.body.length, users_data.length)
+  })
 
-// test('users contain \'id\' field as identifier', async () => {
-//   const response = await api.get('/api/users')
-//   assert.equal(Object.keys(response.body[0]).includes('id'), true)
-//   assert.equal(Object.keys(response.body[0]).includes('_id'), false)
-// })
+})
 
 describe('creating a new user', () => {
   test('a valid user can be created', async () => {
@@ -96,6 +93,7 @@ describe('creating a new user', () => {
     const response = await helper.usersInDb()
     assert.strictEqual(response.length, users_data.length)
   })
+
 })
 
 describe('deleting users', () => {

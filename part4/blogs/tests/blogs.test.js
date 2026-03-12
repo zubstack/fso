@@ -5,19 +5,29 @@ const supertest = require('supertest')
 
 const app = require('../app.js')
 const Blog = require('../models/blog.js')
+const User = require('../models/user.js')
 const blogs_data = require('./blogs.data.js')
+const users_data = require('./users.data.js')
 const helper = require('./helper_test.js')
 
 const api = supertest(app)
 
 beforeEach(async () => {
+  await User.deleteMany({})
   await Blog.deleteMany({})
+  // saving a single user
+  const singleUserObject = new User(users_data[0])
+  const singleUser = await singleUserObject.save()
+
   const blogObjects = blogs_data.map(b => new Blog(b))
-  const promiseArray = blogObjects.map(b => b.save())
+  const promiseArray = blogObjects.map(b => {
+    b.user = singleUser._id
+    return b.save()
+  })
   await Promise.all(promiseArray)
 })
 
-describe('description', () => {
+describe('query blogs information', () => {
   test('blogs are returned as json', async () => {
     await api
       .get('/api/blogs')
@@ -37,9 +47,9 @@ describe('description', () => {
   })
 
   test('the creator\'s user information is displayed with the blog', async () => {
-    const response = await api.get('/api/users')
+    const response = await api.get('/api/blogs')
     const responseKeys = Object.keys(response.body[0])
-    const userKeys = Object.keys(responseKeys)
+    const userKeys = Object.keys(response.body[0].user)
     assert.equal(responseKeys.includes('user'), true)
     assert.equal(userKeys.includes('username'), true)
   })

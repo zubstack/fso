@@ -6,16 +6,25 @@ const supertest = require('supertest')
 
 const app = require('../app.js')
 const User = require('../models/user.js')
+const Blog = require('../models/blog.js')
 const users_data = require('./users.data.js')
+const blogs_data = require('./blogs.data.js')
 const helper = require('./helper_test.js')
 
 const api = supertest(app)
 
 beforeEach(async () => {
   await User.deleteMany({})
+  await Blog.deleteMany({})
   const userObjects = users_data.map(b => new User(b))
   const promiseArray = userObjects.map(b => b.save())
   await Promise.all(promiseArray)
+
+  // saving a single user
+  const singleBlogObject = new Blog(blogs_data[0])
+  const singleUser = await User.findOne({})
+  singleBlogObject.user = singleUser.id
+  await singleBlogObject.save()
 })
 
 describe('query users information', () => {
@@ -29,6 +38,13 @@ describe('query users information', () => {
   test('all users are returned', async () => {
     const response = await api.get('/api/users')
     assert.strictEqual(response.body.length, users_data.length)
+  })
+
+  test('listing all users also displays the blogs created by each user', async () => {
+    const response = await api.get('/api/users')
+    const responseKeys = Object.keys(response.body[0])
+    assert.equal(responseKeys.includes('blogs'), true)
+    assert.equal(Array.isArray(response.body[0].blogs), true)
   })
 
 })

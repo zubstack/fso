@@ -1,14 +1,21 @@
 const Blog = require('../models/blog.js')
+const User = require('../models/user.js')
 const express = require('express')
 const router = express.Router()
 
 router.get('/', async (request, response) => {
-  const result = await Blog.find({})
+  const result = await Blog.find({}).populate('user', { username: 1, name: 1 })
   response.json(result)
 })
 
 router.post('/', async (request, response) => {
   const blog = new Blog(request.body)
+  // random user as owner
+  const singleUser = await User.findOne({})
+  blog.user = singleUser.id
+  singleUser.blogs = singleUser.blogs.concat(blog._id)
+  await singleUser.save()
+
   const result = await blog.save()
   response.status(201).json(result)
 })

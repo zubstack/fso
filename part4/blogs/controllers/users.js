@@ -5,7 +5,7 @@ const express = require('express')
 const router = express.Router()
 
 router.get('/', async (request, response) => {
-  const result = await User.find({})
+  const result = await User.find({}).populate('blogs')
   response.json(result)
 })
 
